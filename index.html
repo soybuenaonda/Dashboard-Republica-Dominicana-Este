@@ -195,9 +195,9 @@
     /* Contenedor envolvente para cada tabla que genera el contorno y sombra */
     .table-responsive-wrapper { 
       overflow-x: auto; 
-      border: 1px solid #cbd5e1; /* Borde de delimitación visible */
+      border: 1px solid #cbd5e1;
       border-radius: 8px; 
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra elegante */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       background: var(--card-bg);
     }
     
@@ -232,7 +232,7 @@
     }
     
     .tabular-data-row:hover { background-color: #f1f5f9; }
-    .tabular-data-row:last-child { border-bottom: none; } /* Se evita doble borde inferior */
+    .tabular-data-row:last-child { border-bottom: none; }
     
     .col-sector {
       font-weight: 900;
@@ -302,7 +302,7 @@
 <div class="main-container">
   <div class="header">
     <div>
-      <h1 id="main-title">REPÚBLICA DOMINICANA — TODOS LOS PROYECTOS</h1>
+      <h1 id="main-title">CONTROL OPERATIVO — TODOS LOS PROYECTOS</h1>
       <p id="current-date-label" style="margin: 0; color: var(--text); font-size: 13px; font-weight: 700;"></p>
     </div>
   </div>
@@ -325,7 +325,7 @@
       </div>
       
       <div class="compact-control">
-        <label>2. Sectores Únicos</label>
+        <label>2. Zonas (Sectores Únicos)</label>
         <div id="dropdown-box" class="dropdown-select-box" onclick="toggleDropdown(event)">
           <span id="dropdown-label">Cargando...</span>
         </div>
@@ -378,7 +378,7 @@
     <!-- SECCIÓN DE TABLA ESTILO EXCEL (2 COLUMNAS ENMARCADAS) -->
     <div class="chart-container">
       <div class="chart-header">
-        <h3 id="chart-title-label">Estatus de Relevamiento por Sector</h3>
+        <h3 id="chart-title-label">Estatus de Relevamiento por Proyecto</h3>
         <span style="font-size: 12px; color: var(--text); font-weight: 700;">Ordenado por prioridad (Menor a Mayor)</span>
       </div>
       
@@ -388,7 +388,7 @@
         <div class="table-responsive-wrapper">
           <div class="custom-bar-list-tabular">
             <div class="tabular-header-row">
-              <div>Sector</div>
+              <div class="col-name-header">Proyecto</div>
               <div>Progreso</div>
               <div style="text-align: right;" title="Homepass">HP</div>
               <div style="text-align: right;" title="Condominios">Condos</div>
@@ -404,7 +404,7 @@
         <div class="table-responsive-wrapper">
           <div class="custom-bar-list-tabular">
             <div class="tabular-header-row">
-              <div>Sector</div>
+              <div class="col-name-header">Proyecto</div>
               <div>Progreso</div>
               <div style="text-align: right;" title="Homepass">HP</div>
               <div style="text-align: right;" title="Condominios">Condos</div>
@@ -423,7 +423,7 @@
 </div>
 
   <script>
-    const SPREADSHEET_ID = '10IJP4byfz5IAIWaE_M6FBYKZsHHDrq3Snzh-GKT_jgc';
+    const SPREADSHEET_ID = '1yGnj99L-Z-W0XIN7vytUeMFUOvo9sVxxbrJiR66Bjm8';
 
     let rawZonasRecords = [];
     let statusZonasLoaded = false;
@@ -473,7 +473,7 @@
 
     function cleanSectorName(name) {
       if (!name) return '';
-      return name.replace(/^SANTO\s+DOMINGO\s+ESTE\s*[-–]?\s*/i, '').trim();
+      return name.trim();
     }
 
     function parseZonasData(table) {
@@ -488,23 +488,23 @@
       const grouped = {};
 
       table.rows.forEach((r) => {
-        const zonaHub = String(getVal(r, 2)).trim();
-        const rawSector = String(getVal(r, 4)).trim();
+        const zonaHub = String(getVal(r, 2)).trim(); // PROYECTO (Col C, índice 2)
+        const rawSector = String(getVal(r, 5)).trim(); // ZONA OZMAP (Col F, índice 5)
         const sectorClean = cleanSectorName(rawSector);
-        const avance = parsePct(getVal(r, 7));
-        const hp = parseClean(getVal(r, 10)); 
-        const condos = parseClean(getVal(r, 12)); 
-        const hpCondos = parseClean(getVal(r, 13)); 
-        const pyme = parseClean(getVal(r, 14)); 
-        const ep = parseClean(getVal(r, 15)); 
-        const cc = parseClean(getVal(r, 16));
+        const avance = parsePct(getVal(r, 12)); // % RELEVAMIENTO (Col M, índice 12)
+        const hp = parseClean(getVal(r, 13)); // # HP (Col N, índice 13)
+        const condos = parseClean(getVal(r, 14)); // CONDOMINIOS (Col O, índice 14)
+        const hpCondos = parseClean(getVal(r, 15)); // HP POR CONDOMINIOS (Col P, índice 15)
+        const pyme = parseClean(getVal(r, 16)); // PYMES (Col Q, índice 16)
+        const ep = parseClean(getVal(r, 17)); // ENTES PUBLICOS (Col R, índice 17)
+        const cc = parseClean(getVal(r, 18)); // CENTROS COMERCIALES (Col S, índice 18)
 
-        if (rawSector && rawSector !== 'NOMBRE ZONA' && rawSector !== 'Sector') {
+        if (rawSector && rawSector !== 'ZONA (OZMAP ID)') {
           const key = zonaHub + '|' + sectorClean;
           
           if (!grouped[key]) {
             grouped[key] = {
-              zonaHub: zonaHub || 'Sin Zona', sector: sectorClean, avanceSum: avance, hpSum: hp, condosSum: condos,
+              zonaHub: zonaHub || 'Sin Proyecto', sector: sectorClean, avanceSum: avance, hpSum: hp, condosSum: condos,
               hpCondosSum: hpCondos, pymeSum: pyme, epSum: ep, ccSum: cc, count: 1
             };
           } else {
@@ -615,15 +615,15 @@
     }
 
     function renderDashboard(filteredZonas, zonaVal) {
-      const totalRegistros = filteredZonas.length;
+      const totalRegistros = filteredZonas.length; 
       const mainTitle = document.getElementById('main-title');
       const zonaUp = String(zonaVal).toUpperCase();
 
-      mainTitle.innerText = zonaUp.includes('ESTE') ? `REPÚBLICA DOMINICANA — ${zonaUp}` : "REPÚBLICA DOMINICANA — TODOS LOS PROYECTOS";
+      mainTitle.innerText = zonaVal === 'ALL' ? "CONTROL OPERATIVO — TODOS LOS PROYECTOS" : `PROYECTO — ${zonaUp}`;
 
       const avgAvance = totalRegistros > 0 ? (filteredZonas.reduce((acc, r) => acc + r.avance, 0) / totalRegistros).toFixed(1) : 0;
 
-      // Asignar KPIs
+      // Asignar KPIs Globales Superiores
       document.getElementById('kpi-registros').innerText = totalRegistros;
       document.getElementById('kpi-hp').innerText = filteredZonas.reduce((a, r) => a + r.hp, 0).toLocaleString('es-VE');
       document.getElementById('kpi-condos').innerText = filteredZonas.reduce((a, r) => a + r.condos, 0).toLocaleString('es-VE');
@@ -633,18 +633,61 @@
       document.getElementById('kpi-cc').innerText = filteredZonas.reduce((a, r) => a + r.cc, 0).toLocaleString('es-VE');
       document.getElementById('kpi-avance').innerText = `${avgAvance}%`;
       
-      document.getElementById('chart-title-label').innerText = `Estatus de Relevamiento por Sector (${filteredZonas.length})`;
+      let displayRecords = [];
+
+      if (zonaVal === 'ALL') {
+        // AGRUPACIÓN POR PROYECTO
+        const projectGroups = {};
+        filteredZonas.forEach(r => {
+          if (!projectGroups[r.zonaHub]) {
+            projectGroups[r.zonaHub] = {
+              name: r.zonaHub,
+              avanceSum: r.avance,
+              count: 1,
+              hp: r.hp, condos: r.condos, hpCondos: r.hpCondos, pyme: r.pyme, ep: r.ep
+            };
+          } else {
+            projectGroups[r.zonaHub].avanceSum += r.avance;
+            projectGroups[r.zonaHub].count += 1;
+            projectGroups[r.zonaHub].hp += r.hp;
+            projectGroups[r.zonaHub].condos += r.condos;
+            projectGroups[r.zonaHub].hpCondos += r.hpCondos;
+            projectGroups[r.zonaHub].pyme += r.pyme;
+            projectGroups[r.zonaHub].ep += r.ep;
+          }
+        });
+
+        displayRecords = Object.values(projectGroups).map(p => ({
+          name: p.name,
+          avance: Math.round(p.avanceSum / p.count),
+          hp: p.hp, condos: p.condos, hpCondos: p.hpCondos, pyme: p.pyme, ep: p.ep
+        }));
+
+        document.getElementById('chart-title-label').innerText = `Estatus de Relevamiento por Proyecto (${displayRecords.length})`;
+        document.querySelectorAll('.col-name-header').forEach(el => el.innerText = 'Proyecto');
+
+      } else {
+        // MOSTRAR ZONAS INDIVIDUALES
+        displayRecords = filteredZonas.map(r => ({
+          name: r.sector,
+          avance: r.avance,
+          hp: r.hp, condos: r.condos, hpCondos: r.hpCondos, pyme: r.pyme, ep: r.ep
+        }));
+
+        document.getElementById('chart-title-label').innerText = `Estatus de Relevamiento por Zona (${displayRecords.length})`;
+        document.querySelectorAll('.col-name-header').forEach(el => el.innerText = 'Zona');
+      }
       
-      // ORDENAR: Menor avance primero para destacar prioridad directiva
-      filteredZonas.sort((a, b) => {
+      // ORDENAR: Menor avance promedio primero
+      displayRecords.sort((a, b) => {
         if (a.avance !== b.avance) return a.avance - b.avance;
-        return a.sector.localeCompare(b.sector);
+        return a.name.localeCompare(b.name);
       });
 
-      let midPoint = Math.ceil(filteredZonas.length / 2);
+      let midPoint = Math.ceil(displayRecords.length / 2);
       let list1Html = '', list2Html = '';
 
-      filteredZonas.forEach((r, i) => {
+      displayRecords.forEach((r, i) => {
         let width = r.avance > 0 ? r.avance : 0;
         let colorClass = getBarColorClass(width);
         
@@ -653,7 +696,7 @@
 
         let rowHtml = `
           <div class="tabular-data-row">
-            <div class="col-sector" title="${r.sector}">${r.sector}</div>
+            <div class="col-sector" title="${r.name}">${r.name}</div>
             <div class="col-bar">
               <div class="bar-fill ${colorClass}" style="width: ${width}%;">${innerText}</div>
               ${outerText}
