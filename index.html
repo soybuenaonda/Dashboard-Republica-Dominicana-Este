@@ -17,7 +17,8 @@
       
       --bar-danger: #ef4444;
       --bar-warning: #f59e0b;
-      --bar-success: #0f766e;
+      --bar-success-light: #10b981; /* Verde más claro para >= 80% y < 100% */
+      --bar-success: #0f766e;      /* Verde oscuro para 100% */
     }
     
     * { box-sizing: border-box; }
@@ -151,8 +152,8 @@
     }
 
     .compact-kpi-title {
-      font-size: 9px;
-      color: var(--text-muted);
+      font-size: 10px;
+      color: var(--text);
       text-transform: uppercase;
       font-weight: 900;
       line-height: 1.2;
@@ -174,7 +175,7 @@
       color: white;
     }
     
-    /* === SECCIÓN DE TABLAS ESTILO EXCEL (2 COLUMNAS CON BORDES Y SOMBRAS) === */
+    /* === SECCIÓN DE TABLAS ESTILO EXCEL === */
     .chart-container { 
       background: var(--card-bg); 
       border-radius: 8px; 
@@ -192,7 +193,7 @@
     
     .custom-bar-grid-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     
-    /* Contenedor envolvente para cada tabla que genera el contorno y sombra */
+    /* Contenedor envolvente */
     .table-responsive-wrapper { 
       overflow-x: auto; 
       border: 1px solid #cbd5e1;
@@ -203,20 +204,20 @@
     
     .custom-bar-list-tabular { display: flex; flex-direction: column; min-width: 500px; }
 
-    /* Ajuste de encabezados con bordes redondeados adaptados al contenedor */
+    /* Ajuste de encabezados con alto contraste */
     .tabular-header-row {
       display: grid;
       grid-template-columns: minmax(110px, 1.8fr) minmax(80px, 1.2fr) 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;
       gap: 10px;
       align-items: center;
       padding: 10px 12px;
-      background-color: #f8fafc;
+      background-color: #e2e8f0; 
       border-bottom: 2px solid var(--border);
       border-radius: 8px 8px 0 0; 
-      font-size: 10px;
+      font-size: 11px;
       text-transform: uppercase;
       font-weight: 900;
-      color: var(--text-muted);
+      color: var(--text);
       letter-spacing: 0.5px;
     }
 
@@ -288,6 +289,7 @@
 
     .val-danger { background-color: var(--bar-danger); }
     .val-warning { background-color: var(--bar-warning); }
+    .val-success-light { background-color: var(--bar-success-light); }
     .val-success { background-color: var(--bar-success); }
 
     @media (max-width: 1024px) {
@@ -302,7 +304,7 @@
 <div class="main-container">
   <div class="header">
     <div>
-      <h1 id="main-title">REPÚBLICA DOMINICANA — TODOS LOS PROYECTOS</h1>
+      <h1 id="main-title">REPÚBLICA DOMINICANA — PROYECTOS</h1>
       <p id="current-date-label" style="margin: 0; color: var(--text); font-size: 13px; font-weight: 700;"></p>
     </div>
   </div>
@@ -375,7 +377,7 @@
       </div>
     </div>
 
-    <!-- SECCIÓN DE TABLA ESTILO EXCEL (2 COLUMNAS ENMARCADAS) -->
+    <!-- SECCIÓN DE TABLA ESTILO EXCEL -->
     <div class="chart-container">
       <div class="chart-header">
         <h3 id="chart-title-label">Estatus de Relevamiento</h3>
@@ -430,7 +432,6 @@
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    // CORRECCIÓN: Se actualiza a es-DO para República Dominicana
     document.getElementById('current-date-label').innerText = `Fecha de consulta: ${today.toLocaleDateString('es-DO')}`;
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -611,7 +612,8 @@
 
     function getBarColorClass(avance) {
       if (avance < 50) return 'val-danger';
-      if (avance < 100) return 'val-warning';
+      if (avance < 80) return 'val-warning';
+      if (avance < 100) return 'val-success-light';
       return 'val-success';
     }
 
@@ -620,11 +622,16 @@
       const mainTitle = document.getElementById('main-title');
       const zonaUp = String(zonaVal).toUpperCase();
 
-      mainTitle.innerText = zonaUp.includes('ESTE') ? `REPÚBLICA DOMINICANA — ${zonaUp}` : "REPÚBLICA DOMINICANA — TODOS LOS PROYECTOS";
+      const uniqueProjectsCount = new Set(filteredZonas.map(r => r.zonaHub)).size;
+
+      if (zonaUp === 'ALL') {
+        mainTitle.innerText = `REPÚBLICA DOMINICANA — PROYECTOS (${uniqueProjectsCount})`;
+      } else {
+        mainTitle.innerText = `REPÚBLICA DOMINICANA — ${zonaUp}`;
+      }
 
       const avgAvance = totalRegistros > 0 ? (filteredZonas.reduce((acc, r) => acc + r.avance, 0) / totalRegistros).toFixed(1) : 0;
 
-      // CORRECCIÓN: Se actualiza a es-DO para República Dominicana en los KPIs globales
       document.getElementById('kpi-registros').innerText = totalRegistros;
       document.getElementById('kpi-hp').innerText = filteredZonas.reduce((a, r) => a + r.hp, 0).toLocaleString('es-DO');
       document.getElementById('kpi-condos').innerText = filteredZonas.reduce((a, r) => a + r.condos, 0).toLocaleString('es-DO');
@@ -636,7 +643,6 @@
       
       let displayRecords = [];
 
-      // LÓGICA DE AGRUPACIÓN POR PROYECTO
       if (zonaVal === 'ALL') {
         const projectGroups = {};
         filteredZonas.forEach(r => {
@@ -661,7 +667,7 @@
 
         displayRecords = Object.values(projectGroups).map(p => ({
           name: p.name,
-          avance: Math.round(p.avanceSum / p.count), // Avance promedio del proyecto
+          avance: Math.round(p.avanceSum / p.count),
           hp: p.hp, condos: p.condos, hpCondos: p.hpCondos, pyme: p.pyme, ep: p.ep
         }));
 
@@ -669,7 +675,6 @@
         document.querySelectorAll('.col-name-header').forEach(el => el.innerText = 'PROYECTO');
 
       } else {
-        // MOSTRAR ZONAS INDIVIDUALES DEL PROYECTO
         displayRecords = filteredZonas.map(r => ({
           name: r.sector,
           avance: r.avance,
@@ -680,7 +685,6 @@
         document.querySelectorAll('.col-name-header').forEach(el => el.innerText = 'SECTOR');
       }
       
-      // ORDENAR: Menor avance primero para destacar prioridad directiva
       displayRecords.sort((a, b) => {
         if (a.avance !== b.avance) return a.avance - b.avance;
         return a.name.localeCompare(b.name);
@@ -697,7 +701,6 @@
         let innerText = width > 20 ? `${width}%` : '';
         let outerText = width <= 20 ? `<span class="bar-outer-text">${width}%</span>` : '';
 
-        // CORRECCIÓN: Se actualiza a es-DO para República Dominicana en los datos de las tablas
         let rowHtml = `
           <div class="tabular-data-row">
             <div class="col-sector" title="${r.name}">${r.name}</div>
