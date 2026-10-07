@@ -17,8 +17,8 @@
       
       --bar-danger: #ef4444;
       --bar-warning: #f59e0b;
-      --bar-success-light: #10b981; /* Verde más claro para >= 80% y < 100% */
-      --bar-success: #0f766e;      /* Verde oscuro para 100% */
+      --bar-success-light: #10b981;
+      --bar-success: #0f766e;
     }
     
     * { box-sizing: border-box; }
@@ -153,7 +153,7 @@
 
     .compact-kpi-title {
       font-size: 10px;
-      color: var(--text);
+      color: var(--text); 
       text-transform: uppercase;
       font-weight: 900;
       line-height: 1.2;
@@ -204,7 +204,7 @@
     
     .custom-bar-list-tabular { display: flex; flex-direction: column; min-width: 500px; }
 
-    /* Ajuste de encabezados con alto contraste */
+    /* Ajuste de encabezados centrado y alto contraste */
     .tabular-header-row {
       display: grid;
       grid-template-columns: minmax(110px, 1.8fr) minmax(80px, 1.2fr) 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr;
@@ -219,6 +219,10 @@
       font-weight: 900;
       color: var(--text);
       letter-spacing: 0.5px;
+    }
+
+    .tabular-header-row > div {
+      text-align: center;
     }
 
     .tabular-data-row {
@@ -241,6 +245,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-align: center;
     }
 
     .col-bar {
@@ -279,7 +284,7 @@
     .col-metric {
       color: var(--text-muted);
       font-weight: 700;
-      text-align: right; 
+      text-align: center; 
     }
     
     .col-metric strong {
@@ -304,7 +309,7 @@
 <div class="main-container">
   <div class="header">
     <div>
-      <h1 id="main-title">REPÚBLICA DOMINICANA — PROYECTOS</h1>
+      <h1 id="main-title">CONTROL OPERATIVO REPÚBLICA DOMINICANA</h1>
       <p id="current-date-label" style="margin: 0; color: var(--text); font-size: 13px; font-weight: 700;"></p>
     </div>
   </div>
@@ -392,11 +397,11 @@
             <div class="tabular-header-row">
               <div class="col-name-header">Sector</div>
               <div>Progreso</div>
-              <div style="text-align: right;" title="Homepass">HP</div>
-              <div style="text-align: right;" title="Condominios">Condos</div>
-              <div style="text-align: right;" title="Homepass por Condominios">HPxC</div>
-              <div style="text-align: right;">PYMES</div>
-              <div style="text-align: right;" title="Entes Públicos">E.P.</div>
+              <div title="Homepass">HP</div>
+              <div title="Condominios">Condos</div>
+              <div title="Homepass por Condominios">HPxC</div>
+              <div>PYMES</div>
+              <div title="Entes Públicos">E.P.</div>
             </div>
             <div id="tabular-data-container-1"></div>
           </div>
@@ -408,11 +413,11 @@
             <div class="tabular-header-row">
               <div class="col-name-header">Sector</div>
               <div>Progreso</div>
-              <div style="text-align: right;" title="Homepass">HP</div>
-              <div style="text-align: right;" title="Condominios">Condos</div>
-              <div style="text-align: right;" title="Homepass por Condominios">HPxC</div>
-              <div style="text-align: right;">PYMES</div>
-              <div style="text-align: right;" title="Entes Públicos">E.P.</div>
+              <div title="Homepass">HP</div>
+              <div title="Condominios">Condos</div>
+              <div title="Homepass por Condominios">HPxC</div>
+              <div>PYMES</div>
+              <div title="Entes Públicos">E.P.</div>
             </div>
             <div id="tabular-data-container-2"></div>
           </div>
@@ -625,9 +630,9 @@
       const uniqueProjectsCount = new Set(filteredZonas.map(r => r.zonaHub)).size;
 
       if (zonaUp === 'ALL') {
-        mainTitle.innerText = `REPÚBLICA DOMINICANA — PROYECTOS (${uniqueProjectsCount})`;
+        mainTitle.innerText = `CONTROL OPERATIVO REPÚBLICA DOMINICANA — PROYECTOS (${uniqueProjectsCount})`;
       } else {
-        mainTitle.innerText = `REPÚBLICA DOMINICANA — ${zonaUp}`;
+        mainTitle.innerText = `CONTROL OPERATIVO REPÚBLICA DOMINICANA — ${zonaUp}`;
       }
 
       const avgAvance = totalRegistros > 0 ? (filteredZonas.reduce((acc, r) => acc + r.avance, 0) / totalRegistros).toFixed(1) : 0;
